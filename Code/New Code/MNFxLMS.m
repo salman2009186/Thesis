@@ -1,4 +1,4 @@
-function [ANR_NFxLMS, E ,MSE]= NFxLMS(x,p,s,mu,PsychoacousticWeighting,fs )
+function [ANR_MNFxLMS] = MNFxLMS(x,p,s,mu,PsychoacousticWeighting,fs)
 
 %% Psychoacoustic weighting
 if PsychoacousticWeighting
@@ -12,8 +12,7 @@ else
     itur = [1;0];
 end
 
-
-
+ 
 L_w         = 128; %length of w
 L_s         = 128;  %length of s
 L_p         = 256; %length of p
@@ -21,25 +20,27 @@ L_p         = 256; %length of p
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%% init
 
-L_x         = length(x);    %length of input signal
+    
+L_x          = length(x);    %length of input signal
 
 w            = zeros(L_w, 1);
 x_p_buf      = zeros(L_p, 1);
 x_s_buf      = zeros(L_s, 1);
 x_w_buf      = zeros(L_w, 1);   
 x_strich_buf = zeros(L_w, 1);
-y_w_buf        = zeros(L_s, 1);
+y_buf        = zeros(L_s, 1);
+ANR_MNFxLMS  = zeros(L_s, 1);
 itur_xbuff= zeros(length(itur),1);
 itur_ebuff= zeros(length(itur),1);
 lms_buff    = zeros(L_w, 1);
 
-E_ANR           = 1;
-D_ANR           = 1;
-lemda           = 0.999;
+E_ANR      = 1;
+D_ANR      = 1;
+lemda      = 0.999;
 
-E   = zeros(L_s, 1);
-MSE   = zeros(L_s, 1);
-ANR_NFxLMS = zeros(L_s, 1);
+
+
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%% run
 
@@ -54,7 +55,6 @@ for i=1:L_x
 
     %%% Compute an store desired signal    
     d    	= p' * x_p_buf;
-
     
     %%% Compute and store x_s signal for adaption 
     x_strich       = s' * x_s_buf;
@@ -65,32 +65,42 @@ for i=1:L_x
     x_lms        = itur'*itur_xbuff; 
 
     %%% Compute an store output signal   
-    y_w       = w'*x_w_buf;
-    y_w_buf   = [y_w ; y_w_buf(1:end-1)];
+    y       = w' * x_w_buf ;
+    y_buf   = [y ; y_buf(1:end-1)];
 
     %%% Output signal after passing secundary path       
-    y_s     = s' * y_w_buf;
-
+    y_s1     = s' * y_buf;
+    y_s2     = y_s1;
+    
     %%% Compute and store error signal
-    e       = d - y_s;
+    e1       = d - y_s1 ;
+    e2       = y_s2 + e1 ;
+    
+    
+    % LMS Update
+    u       = w'*x_strich_buf;
+    g       = e2 - u  ;
     
    % E ITUR 4684 
-   itur_ebuff   = [e; itur_ebuff(1:end-1)];
-   e_lms        = itur'*itur_ebuff;
+   itur_ebuff   = [g; itur_ebuff(1:end-1)];
+   g_lms        = itur'*itur_ebuff;
    
-   % FxLMS adaption
-   lms_buff = [x_lms; lms_buff(1:end-1)];
+    % FxLMS adaption
+    lms_buff = [x_lms; lms_buff(1:end-1)];
    
-	%%% Adaption with FXLMS    
-    MU = mu / ((x_strich_buf'*x_strich_buf )  + 1e-52); % add eps 
-    w         = w + (MU * lms_buff * e_lms );
+    % 
+    MU = mu  / ((x_strich_buf'*x_strich_buf ) + 1e-52); 
+    w         = w + ( MU * lms_buff * g_lms );
+   
     
-    E_ANR=lemda* E_ANR+ (1-lemda)* abs(e);
+    E_ANR=lemda* E_ANR+ (1-lemda)* abs(e1);
     D_ANR=lemda* D_ANR+ (1-lemda)* abs(d);
     
-    ANR_NFxLMS(i)= 20*log10(E_ANR/D_ANR);
+    ANR_MNFxLMS(i)= 20*log10(E_ANR/D_ANR);
+
     
 end
 
 
 end
+
