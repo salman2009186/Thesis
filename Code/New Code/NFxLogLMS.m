@@ -1,10 +1,21 @@
-function [ANR_NSFxLogLMS, E ]= NSFxLMS_Log(x,p,s)
+function [ANR_NFxLogLMS]= NFxLogLMS(x,p,s,mu,PsychoacousticWeighting,fs)
 
-% L_x = 40000;
+%% Psychoacoustic weighting
+if PsychoacousticWeighting
+    %ITU-R 468-4 Weighting Filter
+    ITUR4684Designer = fdesign.audioweighting('WT','ITUR4684',fs);
+    ITUR4684IIR = design(ITUR4684Designer,'iirlpnorm','SystemObject',true);
+    itur = impz(ITUR4684IIR);
+    % z-plane
+    % figure; zplane(ITUR4684IIR)
+else
+    itur = [1;0];
+end
+
+
 L_w         = 128; %length of w
 L_s         = 128;  %length of s
 L_p         = 256; %length of p
-
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%% init
@@ -17,17 +28,18 @@ x_s_buf      = zeros(L_s, 1);
 x_w_buf      = zeros(L_w, 1);   
 x_strich_buf = zeros(L_w, 1);
 y_buf        = zeros(L_s, 1);
+ANR_NFxLogLMS= zeros(L_s, 1);
+itur_xbuff= zeros(length(itur),1);
+itur_ebuff= zeros(length(itur),1);
+lms_buff    = zeros(L_w, 1);
 
-E_ANR      = 1;
-D_ANR      = 1;
-lemda      = 0.995;
+E_ANR           = 1;
+D_ANR           = 1;
+lemda           = 0.999;
 
-E   = [];
-D   = [];
-ANR_NSFxLogLMS= [];
-Ee=1;
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%% run
+
 
 
 for i=1:L_x
@@ -39,11 +51,14 @@ for i=1:L_x
 
     %%% Compute an store desired signal    
     d    	= p' * x_p_buf;
-    D       = [D d];
     
     %%% Compute and store x_s signal for adaption 
     x_strich       = s' * x_s_buf;
     x_strich_buf   = [x_strich ; x_strich_buf(1:end-1)];
+    
+    % X ITUR 4684 
+    itur_xbuff   = [x_strich; itur_xbuff(1:end-1)];
+    x_lms        = itur'*itur_xbuff;
 
     %%% Compute an store output signal   
     y       = w'*x_w_buf;
@@ -55,33 +70,37 @@ for i=1:L_x
     %%% Compute and store error signal
     e       = d - y_s;
     
-    E       = [E e];
     
+    % Calculating ANR
     E_ANR=lemda* E_ANR+ (1-lemda)* abs(e);
     D_ANR=lemda* D_ANR+ (1-lemda)* abs(d);
     
-    ANR_NSFxLogLMS = [ANR_NSFxLogLMS 20*log10(E_ANR/D_ANR)];
-    Ee= lemda* Ee + (1-lemda)* e^2;
+    ANR_NFxLogLMS(i)= 20*log10(E_ANR/D_ANR);
     
-    if abs(e) >  20
-        
-        e = log10(abs(e)) / (e);
-        mu= 0.1 ; %alpha 1.8
-
-    else
-         mu= 0.3;  %alpha 1.8
-         
-
-     end
+    if abs(e) <=1
+        e = log10 (1)/1;  
+    elseif e > 0
+        e = log10 (abs(e))/abs(e);
+    elseif e == 0
+        e=0;
+    elseif e < 0
+        e = - log10 (abs(e))/abs(e);
+    end
     
-    
+   % E ITUR 4684 
+   itur_ebuff   = [e; itur_ebuff(1:end-1)];
+   e_lms        = itur'*itur_ebuff;
+   
+   % FxLMS adaption
+   lms_buff = [x_lms; lms_buff(1:end-1)];
+   
 	%%% Adaption with FXLMS    
-    prefactor = mu / ((x_strich_buf'*x_strich_buf )+ 0.0001); % add eps 
-    w         = w + ( prefactor * x_strich_buf * e);
+    MU = mu / ((x_strich_buf' * x_strich_buf )  + 1e-52); 
+    w         = w + ( MU * lms_buff * e_lms );
     
-
 
     
 end
+
 
 end

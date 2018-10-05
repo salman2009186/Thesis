@@ -1,4 +1,4 @@
-function [ANR_FxLMP] = FxLMP(x,p,s,mu,error_power)
+function [ANR_NFxLMP] = NFxLMP(x,p,s,mu,error_power,PsychoacousticWeighting,fs)
 
 %% Psychoacoustic weighting
 if PsychoacousticWeighting
@@ -32,7 +32,7 @@ x_w_buf      = zeros(L_w, 1);
 x_strich_buf = zeros(L_w, 1);
 y_buf        = zeros(L_s, 1);
 Power_Buffer  = zeros(1, L_x);
-ANR_FxLMP        = zeros(L_x, 1);
+ANR_NFxLMP        = zeros(L_x, 1);
 itur_xbuff= zeros(length(itur),1);
 itur_ebuff= zeros(length(itur),1);
 lms_buff    = zeros(L_w, 1);
@@ -79,7 +79,7 @@ for i=1:L_x
     
     E_ANR = lemda* E_ANR+ (1-lemda)* abs(e);
     D_ANR = lemda* D_ANR+ (1-lemda)* abs(d);
-    ANR_FxLMP(i) = 20*log10(E_ANR/D_ANR);
+    ANR_NFxLMP(i) = 20*log10(E_ANR/D_ANR);
     
     Power_Buffer= [( (abs(x_strich)) ^ error_power)  Power_Buffer(1:end-1)];
      

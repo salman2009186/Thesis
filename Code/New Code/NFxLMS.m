@@ -82,7 +82,7 @@ for i=1:L_x
    lms_buff = [x_lms; lms_buff(1:end-1)];
    
 	%%% Adaption with FXLMS    
-    MU = mu / ((x_strich_buf'*x_strich_buf )  + 1e-52); % add eps 
+    MU = mu / ((x_strich_buf'*x_strich_buf )  + 1e-52); 
     w         = w + (MU * lms_buff * e_lms );
     
     E_ANR=lemda* E_ANR+ (1-lemda)* abs(e);

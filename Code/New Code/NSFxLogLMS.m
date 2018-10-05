@@ -1,4 +1,4 @@
-function [ANR_NFxLMP] = NFxLMP(x,p,s,mu,error_power,PsychoacousticWeighting,fs)
+function [ANR_NSFxLogLMS ]= NSFxLogLMS(x,p,s,PsychoacousticWeighting,fs,mu1,mu2)
 
 %% Psychoacoustic weighting
 if PsychoacousticWeighting
@@ -13,11 +13,9 @@ else
 end
 
 
-
 L_w         = 128; %length of w
 L_s         = 128;  %length of s
 L_p         = 256; %length of p
- 
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -31,17 +29,14 @@ x_s_buf      = zeros(L_s, 1);
 x_w_buf      = zeros(L_w, 1);   
 x_strich_buf = zeros(L_w, 1);
 y_buf        = zeros(L_s, 1);
-Power_Buffer  = zeros(1, L_x);
-ANR_NFxLMP        = zeros(L_x, 1);
+ANR_NSFxLogLMS= zeros(L_x, 1);
 itur_xbuff= zeros(length(itur),1);
 itur_ebuff= zeros(length(itur),1);
 lms_buff    = zeros(L_w, 1);
 
-
 E_ANR      = 1;
 D_ANR      = 1;
 lemda      = 0.999;
-
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%% run
@@ -56,7 +51,6 @@ for i=1:L_x
 
     %%% Compute an store desired signal    
     d    	= p' * x_p_buf;
-
     
     %%% Compute and store x_s signal for adaption 
     x_strich       = s' * x_s_buf;
@@ -77,30 +71,32 @@ for i=1:L_x
     e       = d - y_s;
     
     
-    E_ANR = lemda* E_ANR+ (1-lemda)* abs(e);
-    D_ANR = lemda* D_ANR+ (1-lemda)* abs(d);
-    ANR_NFxLMP(i) = 20*log10(E_ANR/D_ANR);
+    E_ANR=lemda* E_ANR+ (1-lemda)* abs(e);
+    D_ANR=lemda* D_ANR+ (1-lemda)* abs(d);
     
-    Power_Buffer= [( (abs(x_strich)) ^ error_power)  Power_Buffer(1:end-1)];
-     
-    if e < 0
-        e = -error_power * abs(e)^(error_power-1);
-    elseif  e == 0
-        e = 0;
-    elseif  e > 0
-        e = error_power * abs(e)^(error_power-1);
+    ANR_NSFxLogLMS(i) =  20*log10(E_ANR/D_ANR);
+    
+    if abs(e) >  20
+        
+        e = log10(abs(e)) / (e);
+        mu= mu1 ; 
+
+    else
+         mu= mu2;  
+         
+
     end
     
-   % E ITUR 4684 
+        % E ITUR 4684 
    itur_ebuff   = [e; itur_ebuff(1:end-1)];
    e_lms        = itur'*itur_ebuff;
    
    % FxLMS adaption
    lms_buff = [x_lms; lms_buff(1:end-1)];
     
-	%%% Adaption with FXLMS     
-    MU = mu / ( sum(Power_Buffer )   + 1e-52); % add eps 
-    w         = w + ( MU * lms_buff * e_lms);
+	%%% Adaption with FXLMS    
+    prefactor = mu / ((x_strich_buf'*x_strich_buf )+ 1e-52); 
+    w         = w + ( prefactor * lms_buff * e_lms);
     
 
 
@@ -108,5 +104,3 @@ for i=1:L_x
 end
 
 end
-
-

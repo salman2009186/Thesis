@@ -46,7 +46,7 @@ legend({'NFxLMS Psychoacoustic Weighting', 'NFxLMS no Psychoacoustic Weighting'}
 xlabel('Iterations', 'FontSize', 18)
 ylabel('ANR in dB', 'FontSize', 18)
 title('NFxLMS', 'FontSize', 30)
-
+grid on
 %% MNFxLMS 
 figure('units','normalized','outerposition',[0 0 1 1])
 plot(ANR_MNFxLMS_Psycho,'LineWidth', 1.5)
@@ -57,7 +57,7 @@ legend({'MNFxLMS Psychoacoustic Weighting', 'MNFxLMS no Psychoacoustic Weighting
 xlabel('Iterations', 'FontSize', 18)
 ylabel('ANR in dB', 'FontSize', 18)
 title('MNFxLMS', 'FontSize', 30)
-
+grid on
 
 %% MNFxLMS vs NFxLMS Psychoacoustic Weighting
 figure('units','normalized','outerposition',[0 0 1 1])
@@ -69,3 +69,4 @@ legend({'MNFxLMS Psychoacoustic Weighting', 'NFxLMS Psychoacoustic Weighting'}, 
 xlabel('Iterations', 'FontSize', 18)
 ylabel('ANR in dB', 'FontSize', 18)
 title('MNFxLMS', 'FontSize', 30)
+grid on
