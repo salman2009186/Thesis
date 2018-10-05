@@ -5,7 +5,7 @@ clc;
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%% settings
 fs      = 48000;
-secs    = 60*5;
+secs    = 60*1;
 sampls_duration = fs*secs;
 x	= rand( sampls_duration ,1)*2-1;
 
@@ -17,7 +17,6 @@ x	= rand( sampls_duration ,1)*2-1;
 
 %% Normalized
  mu  = 0.01;   % alpha 1.8
-% mu  = 0.09;   % alpha 1.4 
 [ANR_NFxLMS]= NFxLMS(x,p,s,mu);
 
 
