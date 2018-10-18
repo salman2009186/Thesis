@@ -37,8 +37,8 @@ E_ANR           = 1;
 D_ANR           = 1;
 lemda           = 0.999;
 
-E   = zeros(L_s, 1);
-MSE   = zeros(L_s, 1);
+E          = zeros(L_s, 1);
+MSE        = zeros(L_s, 1);
 ANR_NFxLMS = zeros(L_s, 1);
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%% run

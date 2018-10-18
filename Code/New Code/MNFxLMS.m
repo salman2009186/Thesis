@@ -22,17 +22,16 @@ L_p         = 256; %length of p
 
     
 L_x          = length(x);    %length of input signal
-
 w            = zeros(L_w, 1);
 x_p_buf      = zeros(L_p, 1);
 x_s_buf      = zeros(L_s, 1);
 x_w_buf      = zeros(L_w, 1);   
 x_strich_buf = zeros(L_w, 1);
-y_s_buf        = zeros(L_s, 1);
+y_s_buf      = zeros(L_s, 1);
 ANR_MNFxLMS  = zeros(L_s, 1);
-itur_xbuff= zeros(length(itur),1);
-itur_ebuff= zeros(length(itur),1);
-lms_buff    = zeros(L_w, 1);
+itur_x_buff   = zeros(length(itur),1);
+itur_ebuff   = zeros(length(itur),1);
+lms_buff     = zeros(L_w, 1);
 
 E_ANR      = 1;
 D_ANR      = 1;
@@ -61,8 +60,8 @@ for i=1:L_x
     x_strich_buf   = [x_strich ; x_strich_buf(1:end-1)];
     
     % X ITUR 4684 
-    itur_xbuff   = [x_strich; itur_xbuff(1:end-1)];
-    x_lms        = itur'*itur_xbuff; 
+    itur_x_buff   = [x_strich; itur_x_buff(1:end-1)];
+    x_lms        = itur'*itur_x_buff; 
 
     %%% Compute an store output signal   
     y_w       = w' * x_w_buf ;

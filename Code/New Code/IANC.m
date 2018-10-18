@@ -4,13 +4,13 @@ clc;
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%% settings
 fs      = 48000;
-secs    = 60*0.1;
+secs    = 60*2;
 sampls_duration = fs*secs;
 
  alpha = 1.7;
- x	= 1 * stablernd(alpha,0,1,0,sampls_duration/2,1) ;
+ x	= 1 * stablernd(alpha,0,1,0,sampls_duration,1) ;
 
- plot(x);
+% load('ExcitationSignal_alpha17.mat','x'); % excitation Signal
 
 
 %% primary and secondary path
@@ -23,53 +23,72 @@ error_power     = alpha-0.1;
 mu  = 0.05; 
 [ANR_NFxLMP_Psycho] = NFxLMP(x,p,s,mu,error_power,PsychoacousticWeighting,fs);
 
-% % NFxLMP No Psycho Weighting
-% PsychoacousticWeighting = false;
-% mu  = 0.3;  
-% [ANR_NFxLMP_NoPsycho] = NFxLMP(x,p,s,mu,error_power,PsychoacousticWeighting,fs);
+% NFxLMP No Psycho Weighting
+PsychoacousticWeighting = false;
+mu  = 0.3;  
+[ANR_NFxLMP_NoPsycho] = NFxLMP(x,p,s,mu,error_power,PsychoacousticWeighting,fs);
+
+%  save('NFxLMP.mat' ,'ANR_NFxLMP_Psycho','ANR_NFxLMP_NoPsycho')
 
 
 
-%% NFxLogLMS Psycho Weighting
-PsychoacousticWeighting = true;
- mu = 0.6;
-[ANR_NFxLogLMS_Psycho] = NFxLogLMS(x,p,s,mu,PsychoacousticWeighting,fs);
 
+
+% %% NFxLogLMS Psycho Weighting
+% PsychoacousticWeighting = true;
+%  mu = 0.6;
+% [ANR_NFxLogLMS_Psycho] = NFxLogLMS(x,p,s,mu,PsychoacousticWeighting,fs);
+% 
 % % NFxLogLMS No Psycho Weighting
 % PsychoacousticWeighting = false;
 %  mu = 6.0;
 % [ANR_NFxLogLMS_NoPsycho]= NFxLogLMS(x,p,s,mu,PsychoacousticWeighting,fs);
+% 
+% 
+% save('NFxLogLMS.mat' ,'ANR_NFxLogLMS_Psycho','ANR_NFxLogLMS_NoPsycho')
 
 
 
 
-%% NSFxLogLMS Psycho Weighting
-PsychoacousticWeighting = true;
-mu1 =0.1;
-mu2 =0.03;
-[ANR_NSFxLogLMS_Psycho ]= NSFxLogLMS(x,p,s,PsychoacousticWeighting,fs,mu1,mu2);
 
+
+% %% NSFxLogLMS Psycho Weighting
+% PsychoacousticWeighting = true;
+% mu1 =0.1;
+% mu2 =0.03;
+% [ANR_NSFxLogLMS_Psycho ]= NSFxLogLMS(x,p,s,PsychoacousticWeighting,fs,mu1,mu2);
+% 
 % % NSFxLogLMS No Psycho Weighting
 % PsychoacousticWeighting = false;
 % mu1 =0.5;
 % mu2 =0.3;
 % [ANR_NSFxLogLMS_NoPsycho ]= NSFxLogLMS(x,p,s,PsychoacousticWeighting,fs,mu1,mu2);
+% 
+% save('NSFxLogLMS.mat' ,'ANR_NSFxLogLMS_Psycho' , 'ANR_NSFxLogLMS_NoPsycho' )
 
 
-% %% Plots
-% 
-% %% NFxLMP 
-% figure('units','normalized','outerposition',[0 0 1 1])
-% plot(ANR_NFxLMP_Psycho,'LineWidth', 1.5)
-% hold on
-% plot(ANR_NFxLMP_NoPsycho,'LineWidth', 1.5)
-% hold off
-% legend({'NFxLMP Psychoacoustic Weighting', 'NFxLMP no Psychoacoustic Weighting'}, 'FontSize', 18,'LineWidth', 1.5)
-% xlabel('Iterations', 'FontSize', 18)
-% ylabel('ANR in dB', 'FontSize', 18)
-% title('NFxLMP', 'FontSize', 30)
-% grid on
-% 
+
+
+
+
+
+
+
+
+%% Plots
+
+%% NFxLMP 
+figure('units','normalized','outerposition',[0 0 1 1])
+plot(ANR_NFxLMP_Psycho,'LineWidth', 1.5)
+hold on
+plot(ANR_NFxLMP_NoPsycho,'LineWidth', 1.5)
+hold off
+legend({'NFxLMP Psychoacoustic Weighting', 'NFxLMP no Psychoacoustic Weighting'}, 'FontSize', 18,'LineWidth', 1.5)
+xlabel('Iterations', 'FontSize', 18)
+ylabel('ANR in dB', 'FontSize', 18)
+title('NFxLMP', 'FontSize', 30)
+grid on
+
 % %% NFxLogLMS 
 % figure('units','normalized','outerposition',[0 0 1 1])
 % plot(ANR_NFxLogLMS_Psycho,'LineWidth', 1.5)
@@ -81,11 +100,12 @@ mu2 =0.03;
 % ylabel('ANR in dB', 'FontSize', 18)
 % title('NFxLogLMS', 'FontSize', 30)
 % grid on
-% 
-% 
+
+
 % %% NSFxLogLMS 
 % figure('units','normalized','outerposition',[0 0 1 1])
 % plot(ANR_NSFxLogLMS_Psycho,'LineWidth', 1.5)
+% 
 % hold on
 % plot(ANR_NSFxLogLMS_NoPsycho,'LineWidth', 1.5)
 % hold off
@@ -95,15 +115,15 @@ mu2 =0.03;
 % title('NSFxLogLMS', 'FontSize', 30)
 % grid on
 
-%% NFxLogLMS vs NSFxLogLMS Psychoacoustic Weighting
-figure('units','normalized','outerposition',[0 0 1 1])
-plot(ANR_NFxLMP_Psycho,'LineWidth', 1.5)
-hold on
-plot(ANR_NFxLogLMS_Psycho,'LineWidth', 1.5)
-plot(ANR_NSFxLogLMS_Psycho,'LineWidth', 1.5)
-hold off
-legend({'NFxLMP Psychoacoustic Weighting','NFxLogLMS Psychoacoustic Weighting', 'NSFxLogLMS Psychoacoustic Weighting'}, 'FontSize', 18,'LineWidth', 1.5)
-xlabel('Iterations', 'FontSize', 18)
-ylabel('ANR in dB', 'FontSize', 18)
-title('NFxLMP vs NFxLogLMS vs NSFxLogLMS', 'FontSize', 30)
-grid on
+% %% NFxLogLMS vs NSFxLogLMS Psychoacoustic Weighting
+% figure('units','normalized','outerposition',[0 0 1 1])
+% plot(ANR_NFxLMP_Psycho,'LineWidth', 1.5)
+% hold on
+% plot(ANR_NFxLogLMS_Psycho,'LineWidth', 1.5)
+% plot(ANR_NSFxLogLMS_Psycho,'LineWidth', 1.5)
+% hold off
+% legend({'NFxLMP Psychoacoustic Weighting','NFxLogLMS Psychoacoustic Weighting', 'NSFxLogLMS Psychoacoustic Weighting'}, 'FontSize', 18,'LineWidth', 1.5)
+% xlabel('Iterations', 'FontSize', 18)
+% ylabel('ANR in dB', 'FontSize', 18)
+% title('NFxLMP vs NFxLogLMS vs NSFxLogLMS Psychoacoustic Weighting', 'FontSize', 30)
+% grid on

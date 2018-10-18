@@ -21,17 +21,16 @@ L_p         = 256; %length of p
 %%% init
 
 L_x         = length(x);    %length of input signal
-
-w            = zeros(L_w, 1);
-x_p_buf      = zeros(L_p, 1);
-x_s_buf      = zeros(L_s, 1);
-x_w_buf      = zeros(L_w, 1);   
-x_strich_buf = zeros(L_w, 1);
-y_buf        = zeros(L_s, 1);
-ANR_NFxLogLMS= zeros(L_s, 1);
-itur_xbuff= zeros(length(itur),1);
-itur_ebuff= zeros(length(itur),1);
-lms_buff    = zeros(L_w, 1);
+w             = zeros(L_w, 1);
+x_p_buf       = zeros(L_p, 1);
+x_s_buf       = zeros(L_s, 1);
+x_w_buf       = zeros(L_w, 1);   
+x_strich_buf  = zeros(L_w, 1);
+y_buf         = zeros(L_s, 1);
+ANR_NFxLogLMS = zeros(L_s, 1);
+itur_xbuff    = zeros(length(itur),1);
+itur_ebuff    = zeros(length(itur),1);
+lms_buff      = zeros(L_w, 1);
 
 E_ANR           = 1;
 D_ANR           = 1;
