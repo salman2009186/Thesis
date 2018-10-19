@@ -1,0 +1,67 @@
+clc
+ close all 
+ clear all
+
+Fs      = 48000;
+secs    = 60 *1;
+sampls_duration = Fs*secs;
+
+
+
+
+lemda= 0.999;
+E_shor_Sim=1;
+
+load('NFeLMS_Error.mat', 'e_lms_buff','e_buff')
+
+L_x = 10000000;
+x = 1:L_x ;
+fft_buff= 10000;
+
+x_buff= zeros(fft_buff,1);
+for i=1:length(x)
+    
+ x_buff	= [ x(i) ; x_buff(1:end-1)];
+    
+ if mod(i,10000)==0
+     E_buff = fft(x_buff .* hann(length(x_buff)));
+     E_short = E_buff(1:length(x_buff)/2+1);
+     freq = 0:Fs/length(x_buff):Fs/2;
+     semilogx(freq,20*log(abs(E_short)));
+        
+     drawn
+ end
+end
+     
+% E_buff = fft(x .* hann(length(x)));
+% 
+% E_short = E_buff(1:length(x)/2+1)
+% 
+% E_short_buff= zeros(length(E_short),1);
+% 
+% 
+% 
+% for i=1:length(E_short)
+%    E_shor_Sim = lemda * E_shor_Sim +(1-lemda)*abs(E_short(i));
+%     E_short_buff(i)= E_shor_Sim;
+% end
+% 
+% 
+% freq = 0:Fs/length(x):Fs/2;
+% 
+% figure('units','normalized','outerposition',[0 0 1 1])
+% semilogx(freq,20*log(E_short_buff));
+% xlabel('Frequancy (Hz)', 'FontSize', 18)
+% ylabel('Gain(dB)', 'FontSize', 18)
+% title('NFeLMS', 'FontSize', 30)
+% grid on
+
+
+
+
+
+
+
+
+
+
