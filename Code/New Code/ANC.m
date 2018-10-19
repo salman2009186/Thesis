@@ -4,11 +4,10 @@ clc;
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%% settings
 fs      = 48000;
-secs    = 60*5;
+secs    = 60 * .1;
 sampls_duration = fs*secs;
 x	= rand( sampls_duration ,1)*2-1;
-
-save('ExcitationSignal_Gaussian.mat','x'); % excitation Signal
+% save('ExcitationSignal_Gaussian.mat','x'); % excitation Signal
 
 
 %% primary and secondary path
@@ -17,31 +16,31 @@ save('ExcitationSignal_Gaussian.mat','x'); % excitation Signal
 
 %% NFxLMS Psycho Weighting
 PsychoacousticWeighting = true;
- mu  = 0.03; 
+ mu  = 0.1; 
 [ANR_NFxLMS_Psycho]= NFxLMS(x,p,s,mu,PsychoacousticWeighting,fs);
 
-% NFxLMS No Psycho Weighting
-PsychoacousticWeighting = false;
- mu  = 0.3;  
-[ANR_NFxLMS_NoPsycho]= NFxLMS(x,p,s,mu,PsychoacousticWeighting,fs);
+% % NFxLMS No Psycho Weighting
+% PsychoacousticWeighting = false;
+%  mu  = 0.3;  
+% [ANR_NFxLMS_NoPsycho]= NFxLMS(x,p,s,mu,PsychoacousticWeighting,fs);
 
 
-save('NFxLMS.mat','ANR_NFxLMS_Psycho','ANR_NFxLMS_NoPsycho'); 
+% save('NFxLMS.mat','ANR_NFxLMS_Psycho','ANR_NFxLMS_NoPsycho'); 
 
-%% MNFxLMS Psycho Weighting
-PsychoacousticWeighting = true;
-mu = 0.03;
-[ANR_MNFxLMS_Psycho] = MNFxLMS(x,p,s,mu,PsychoacousticWeighting,fs) ;
+% %% MNFxLMS Psycho Weighting
+% PsychoacousticWeighting = true;
+% mu = 0.03;
+% [ANR_MNFxLMS_Psycho] = MNFxLMS(x,p,s,mu,PsychoacousticWeighting,fs) ;
+% 
+% % MNFxLMS No Psycho Weighting
+% PsychoacousticWeighting = false;
+% mu = 0.3;
+% [ANR_MNFxLMS_NoPsycho] = MNFxLMS(x,p,s,mu,PsychoacousticWeighting,fs) ;
+% 
+% save('MNFxLMS.mat','ANR_MNFxLMS_Psycho','ANR_MNFxLMS_NoPsycho'); 
 
-% MNFxLMS No Psycho Weighting
-PsychoacousticWeighting = false;
-mu = 0.3;
-[ANR_MNFxLMS_NoPsycho] = MNFxLMS(x,p,s,mu,PsychoacousticWeighting,fs) ;
 
-save('MNFxLMS.mat','ANR_MNFxLMS_Psycho','ANR_MNFxLMS_NoPsycho'); 
-
-
-%% Plots
+% Plots
 
 % %% NFxLMS 
 % figure('units','normalized','outerposition',[0 0 1 1])
@@ -54,6 +53,8 @@ save('MNFxLMS.mat','ANR_MNFxLMS_Psycho','ANR_MNFxLMS_NoPsycho');
 % ylabel('ANR in dB', 'FontSize', 18)
 % title('NFxLMS', 'FontSize', 30)
 % grid on
+
+
 % %% MNFxLMS 
 % figure('units','normalized','outerposition',[0 0 1 1])
 % plot(ANR_MNFxLMS_Psycho,'LineWidth', 1.5)
@@ -65,7 +66,7 @@ save('MNFxLMS.mat','ANR_MNFxLMS_Psycho','ANR_MNFxLMS_NoPsycho');
 % ylabel('ANR in dB', 'FontSize', 18)
 % title('MNFxLMS', 'FontSize', 30)
 % grid on
-% 
+
 % %% MNFxLMS vs NFxLMS Psychoacoustic Weighting
 % figure('units','normalized','outerposition',[0 0 1 1])
 % plot(ANR_MNFxLMS_Psycho,'LineWidth', 1.5)
