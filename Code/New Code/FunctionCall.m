@@ -13,12 +13,8 @@ x	= rand( sampls_duration ,1)*2-1;
 %% NFxLMS Psycho Weighting
 PsychoacousticWeighting = true;
  mu  = 0.1; 
-[ANR_NFxLMS_Psycho]= NFeLMS(x,p,s,mu,PsychoacousticWeighting,fs);
+%  [ANR_NFxLMS_Psycho]= NFeLMS(x,p,s,mu,PsychoacousticWeighting,fs);
 
-% %% NFxLMS 
-% figure('units','normalized','outerposition',[0 0 1 1])
-% plot(ANR_NFxLMS_Psycho,'LineWidth', 1.5)
-% xlabel('Iterations', 'FontSize', 18)
-% ylabel('ANR in dB', 'FontSize', 18)
-% title('NFxLMS', 'FontSize', 30)
-% grid on
+ mu  = 0.3;
+[ ANR_NFxLMS ]= NFxLMS(x,p,s,mu,fs );
+

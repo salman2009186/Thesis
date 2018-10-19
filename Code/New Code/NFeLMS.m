@@ -40,12 +40,10 @@ ANR_NFeLMS      = zeros(L_s, 1);
 %%% run
 L_fft_buff      = 60 *5 ;
 elms_fft_buff   = zeros(L_fft_buff,1);
-e_fft_buff      = zeros(L_fft_buff,1);
-E_filter        = ones(L_fft_buff/2+1,1);
 E_lms_filter    = ones(L_fft_buff/2+1,1);
-
+offset_v = 20*log10(2/L_fft_buff);
 figure('units','normalized','outerposition',[0 0 1 1])
-sec = 0;
+
 for i=1:L_x
 
 	%%% Store input signal in buffers
@@ -94,7 +92,6 @@ for i=1:L_x
     
       
      elms_fft_buff	= [ e_lms ; elms_fft_buff(1:end-1)];
-     e_fft_buff	= [ e ; e_fft_buff(1:end-1)];
      
     if mod(i,L_fft_buff)==0
      
@@ -104,30 +101,17 @@ for i=1:L_x
     freq_lms = 0:fs/L_fft_buff:fs/2;
      
     E_lms_filter = lemda.* E_lms_filter+ (1-lemda).* abs(Elms_short);
-    subplot(3,1,1); 
-    semilogx(freq_lms, 20*log(E_lms_filter));
+    subplot(2,1,1); 
+    semilogx(freq_lms, 20*log(E_lms_filter)+offset_v);
     xlabel('Frequency (Hz)', 'FontSize', 18)
     ylabel('Gain (dB)', 'FontSize', 18)
     title('NFeLMS', 'FontSize', 30)
     legend('Noise weighting error')
     grid on
     
-     % error
-     E_buff = fft(e_fft_buff .* hann(L_fft_buff));
-     E_short = E_buff(1:L_fft_buff/2+1);
-     freq = 0:fs/L_fft_buff:fs/2;
-     E_filter = lemda.* E_filter+ (1-lemda).* abs(E_short);
-    
-     subplot(3,1,2);
-    semilogx(freq,20*log(E_filter));
-    xlabel('Frequency (Hz)', 'FontSize', 18)
-    ylabel('Gain (dB)', 'FontSize', 18)
-    legend('error before noise weighting')
-    grid on
-    
     
     % ANR 
-    subplot(3,1,3);
+    subplot(2,1,2);
     plot(ANR_NFeLMS,'LineWidth', 1.5);
     xlabel('Iterations', 'FontSize', 18)
     ylabel('ANR in dB', 'FontSize', 18)
@@ -135,9 +119,7 @@ for i=1:L_x
     grid on
 
     drawnow
- 
-    sec=sec+1
-    
+  
      end
    
 
