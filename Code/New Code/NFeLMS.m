@@ -39,10 +39,11 @@ ANR_NFeLMS      = zeros(L_s, 1);
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%% run
 L_fft_buff      = 60 *5 ;
-elms_fft_buff      = zeros(L_fft_buff,1);
+elms_fft_buff   = zeros(L_fft_buff,1);
 e_fft_buff      = zeros(L_fft_buff,1);
-E_filter   = ones(L_fft_buff/2+1,1);
-E_lms_filter   = ones(L_fft_buff/2+1,1);
+E_filter        = ones(L_fft_buff/2+1,1);
+E_lms_filter    = ones(L_fft_buff/2+1,1);
+
 figure('units','normalized','outerposition',[0 0 1 1])
 sec = 0;
 for i=1:L_x
@@ -90,38 +91,34 @@ for i=1:L_x
     D_ANR=lemda* D_ANR+ (1-lemda)* abs(d);   
     ANR_NFeLMS(i)= 20*log10(E_ANR/D_ANR);
     
-   
     
-    
-   
-        
       
      elms_fft_buff	= [ e_lms ; elms_fft_buff(1:end-1)];
      e_fft_buff	= [ e ; e_fft_buff(1:end-1)];
      
     if mod(i,L_fft_buff)==0
      
-      % e_lms
-     Elms_buff = fft(elms_fft_buff .* hann(L_fft_buff));
-     Elms_short = Elms_buff(1:L_fft_buff/2+1);
-     freq_lms = 0:fs/L_fft_buff:fs/2;
+      % error noise weighting
+    Elms_buff = fft(elms_fft_buff .* hann(L_fft_buff));
+    Elms_short = Elms_buff(1:L_fft_buff/2+1);
+    freq_lms = 0:fs/L_fft_buff:fs/2;
      
-     E_lms_filter = lemda.* E_lms_filter+ (1-lemda).* abs(Elms_short);
-    
+    E_lms_filter = lemda.* E_lms_filter+ (1-lemda).* abs(Elms_short);
     subplot(3,1,1); 
-    semilogx(freq_lms,20*log(E_lms_filter));
+    semilogx(freq_lms, 20*log(E_lms_filter));
     xlabel('Frequency (Hz)', 'FontSize', 18)
     ylabel('Gain (dB)', 'FontSize', 18)
     title('NFeLMS', 'FontSize', 30)
     legend('Noise weighting error')
     grid on
     
-     % e
+     % error
      E_buff = fft(e_fft_buff .* hann(L_fft_buff));
      E_short = E_buff(1:L_fft_buff/2+1);
      freq = 0:fs/L_fft_buff:fs/2;
      E_filter = lemda.* E_filter+ (1-lemda).* abs(E_short);
-    subplot(3,1,2);
+    
+     subplot(3,1,2);
     semilogx(freq,20*log(E_filter));
     xlabel('Frequency (Hz)', 'FontSize', 18)
     ylabel('Gain (dB)', 'FontSize', 18)
@@ -129,12 +126,12 @@ for i=1:L_x
     grid on
     
     
-    
+    % ANR 
     subplot(3,1,3);
     plot(ANR_NFeLMS,'LineWidth', 1.5);
     xlabel('Iterations', 'FontSize', 18)
     ylabel('ANR in dB', 'FontSize', 18)
-%     title('NFeLMS', 'FontSize', 30)
+%   title('NFeLMS', 'FontSize', 30)
     grid on
 
     drawnow
