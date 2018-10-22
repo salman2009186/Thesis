@@ -6,7 +6,7 @@ clc;
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%% settings
 fs              = 48000;
-secs            = 60 * .01;
+secs            = 60 * .5;
 sampls_duration = fs*secs;
 x               = rand( sampls_duration ,1)*2-1;
 

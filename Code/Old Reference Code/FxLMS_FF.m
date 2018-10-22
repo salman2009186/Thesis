@@ -1,9 +1,9 @@
     close all
     clear all
     fs      = 48000;
-    secs    = 60*5;
+    secs    = 60*.5;
     sampls_duration = fs*secs;
-    psycho  = true;
+    psycho  = false;
     Lw      = 1024; 
     x       = rand(sampls_duration,1)*2-1;
 
